@@ -44,7 +44,7 @@ module Torckapi
                           url
                         end
           request = Net::HTTP::Get.new(request_url)
-          Net::HTTP.start(url.host, url.port, open_timeout: timeout, read_timeout: timeout) do |http|
+          Net::HTTP.start(url.host, url.port, continue_timeout: timeout, open_timeout: timeout, read_timeout: timeout) do |http|
             http.request(request).body
           end
         rescue Errno::ECONNRESET, Errno::ETIMEDOUT, Timeout::Error, Errno::ECONNREFUSED
