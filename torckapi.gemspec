@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.licenses      = ["MIT"]
 
   gem.add_dependency 'bencode', '~> 0'
-  
+  gem.add_dependency 'typhoeus'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec', '~> 3.2'
   gem.add_development_dependency 'simplecov'

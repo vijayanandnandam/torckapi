@@ -8,7 +8,8 @@ module Torckapi
       # (see Base#announce)
       def announce(info_hash)
         super
-        Torckapi::Response::Announce.from_http(info_hash, perform_request(url_for(@url.dup, Announce, info_hash)))
+        peer_id = "-AZ2060-#{SecureRandom.hex(12)}"
+        Torckapi::Response::Announce.from_http(info_hash, perform_request(url_for(@url.dup, Announce, info_hash, peer_id)))
       end
 
       # (see Base#scrape)
@@ -26,10 +27,17 @@ module Torckapi
         @url.query ||= ""
       end
 
-      def url_for(url, action, data)
+      def url_for(url, action, data, peed = null)
         url.query += info_hash_params [*data]
         url.path.gsub!(/announce/, 'scrape') if Scrape == action
+        url.query += "&peer_id=%s" % URI.encode([peer_id].pack('H*')) if Announce == action
         url
+      end
+
+      def peer_id
+        @peerId = "-QR0001-" # Azureus style
+        @peerId << Process.pid.to_s
+        @peerId = @peerId + "x" * (20-@peerId.length)
       end
 
       def perform_request(url)
@@ -38,15 +46,12 @@ module Torckapi
 
         begin
           timeout = @options[:timeout]
-          request_url = if Gem::Version.new(RUBY_VERSION) <= Gem::Version.new('1.9.3')
-                          url.to_s
-                        else
-                          url
-                        end
-          request = Net::HTTP::Get.new(request_url)
-          Net::HTTP.start(url.host, url.port, continue_timeout: timeout, open_timeout: timeout, read_timeout: timeout) do |http|
-            http.request(request).body
-          end
+          Typhoeus::Request.new(
+            url,
+            method: 'GET',
+            timeout: timeout,
+            followlocation: true
+          ).run.body
         rescue Errno::ECONNRESET, Errno::ETIMEDOUT, Timeout::Error, Errno::ECONNREFUSED
           if (tries += 1) <= @options[:tries]
             retry # backs up to just after the "begin"
