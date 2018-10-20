@@ -27,7 +27,7 @@ module Torckapi
         @url.query ||= ""
       end
 
-      def url_for(url, action, data, peed = null)
+      def url_for(url, action, data, peed = nil)
         url.query += info_hash_params [*data]
         url.path.gsub!(/announce/, 'scrape') if Scrape == action
         url.query += "&peer_id=%s" % URI.encode([peer_id].pack('H*')) if Announce == action
