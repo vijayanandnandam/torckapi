@@ -46,7 +46,7 @@ module Torckapi
 
         begin
           timeout = @options[:timeout]
-          Typhoeus::Request.new(
+          ::Typhoeus::Request.new(
             url,
             method: 'GET',
             timeout: timeout,
