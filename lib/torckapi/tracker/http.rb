@@ -1,6 +1,6 @@
 require 'net/http'
 require 'torckapi/tracker/base'
-
+require 'typhoeus'
 module Torckapi
   module Tracker
 
